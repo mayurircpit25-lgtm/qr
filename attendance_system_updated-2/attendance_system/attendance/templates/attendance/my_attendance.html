@@ -1,0 +1,28 @@
+{% extends 'attendance/base.html' %}
+{% block title %}My attendance · QR Attendance{% endblock %}
+{% block content %}
+<h1>My attendance</h1>
+<p class="sub">To mark attendance, scan the QR code on your teacher's screen with your phone camera, then log in if asked.</p>
+
+<div class="card">
+  <small style="color:var(--muted);font-weight:700">Classes attended</small>
+  <div style="font-size:40px;font-weight:800;line-height:1.1">{{ records|length }}</div>
+</div>
+
+<div class="card">
+  <h2>History</h2>
+  <ul class="list">
+  {% for r in records %}
+    <li>
+      <div>
+        <div class="t">{{ r.session.title }}</div>
+        <div class="m">{{ r.marked_at|date:"d M Y, h:i A" }}</div>
+      </div>
+      <span class="badge on">Present</span>
+    </li>
+  {% empty %}
+    <li class="empty" style="display:block">No attendance yet. Scan a QR code in class to get started.</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

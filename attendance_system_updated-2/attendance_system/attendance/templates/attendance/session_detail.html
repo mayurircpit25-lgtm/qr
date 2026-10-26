@@ -1,0 +1,78 @@
+{% extends 'attendance/base.html' %}
+{% block title %}{{ session.title }} · QR Attendance{% endblock %}
+{% block head %}
+<style>
+  .stage{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+  .qr{width:min(320px,100%);aspect-ratio:1;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+  .qr img{width:100%;height:100%;display:block}
+  .timer{font-size:56px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+  .timer.done{color:var(--bad)}
+  .count{font-size:40px;font-weight:800;line-height:1}
+  .stat{margin-top:20px}
+  .stat small{display:block;color:var(--muted);font-weight:700}
+  @media (max-width:640px){.stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+</style>
+{% endblock %}
+{% block content %}
+<h1>{{ session.title }}</h1>
+<p class="sub">{% if session.room_name %}Room {{ session.room_name }} · {% endif %}Students must be within {{ session.radius_m }} m of the classroom to mark attendance. Show this QR code to your class.</p>
+
+<div class="card stage">
+  <div class="qr"><img src="{% url 'session_qr' session.token %}" alt="QR code for {{ session.title }}"></div>
+  <div>
+    <small style="color:var(--muted);font-weight:700">Time left</small>
+    <div id="timer" class="timer" data-end="{{ session.expires_at|date:'c' }}">--:--</div>
+    <div class="stat">
+      <small>Students present</small>
+      <div id="count" class="count">{{ records|length }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Present</h2>
+  <div id="attendees">
+    <ul class="list">
+    {% for r in records %}
+      <li>
+        <div>
+          <div class="t">{{ r.student.user.get_full_name|default:r.student.user.username }}</div>
+          <div class="m">Roll no. {{ r.student.roll_no }}{% if r.distance_m is not None %} · {{ r.distance_m|floatformat:1 }} m away{% endif %}</div>
+        </div>
+        <div class="m">{{ r.marked_at|date:"h:i:s A" }}</div>
+      </li>
+    {% empty %}
+      <li class="empty" style="display:block">No one has scanned yet.</li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<a class="btn ghost" href="{% url 'session_list' %}">Back to sessions</a>
+
+<script>
+  const timer = document.getElementById('timer');
+  const end = new Date(timer.dataset.end).getTime();
+  let expired = false;
+
+  function tick(){
+    const left = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    if (left === 0) { timer.textContent = 'Closed'; timer.classList.add('done'); expired = true; return; }
+    const m = String(Math.floor(left / 60)).padStart(2, '0');
+    const s = String(left % 60).padStart(2, '0');
+    timer.textContent = m + ':' + s;
+  }
+  tick();
+  const clock = setInterval(() => { tick(); if (expired) clearInterval(clock); }, 1000);
+
+  async function refresh(){
+    try {
+      const res = await fetch(location.href, {credentials: 'same-origin'});
+      const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      document.getElementById('attendees').innerHTML = doc.getElementById('attendees').innerHTML;
+      document.getElementById('count').textContent = doc.getElementById('count').textContent;
+    } catch (e) {}
+  }
+  const poll = setInterval(() => { refresh(); if (expired) clearInterval(poll); }, 5000);
+</script>
+{% endblock %}

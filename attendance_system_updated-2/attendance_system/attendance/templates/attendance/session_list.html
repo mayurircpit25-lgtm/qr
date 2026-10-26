@@ -1,0 +1,84 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Sessions · QR Attendance{% endblock %}
+{% block content %}
+<h1>Class sessions</h1>
+<p class="sub">Create a session to get a QR code for your students.</p>
+
+<form method="post" class="card" id="sessionForm">
+  {% csrf_token %}
+  <h2>New session</h2>
+  <div class="row">
+    <div class="grow">
+      <label for="title">Class title</label>
+      <input id="title" name="title" placeholder="e.g. Maths, Period 2" required>
+    </div>
+    <div class="grow">
+      <label for="room_name">Room number</label>
+      <input id="room_name" name="room_name" placeholder="e.g. B-204">
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <div class="fixed">
+      <label for="minutes">QR valid for</label>
+      <select id="minutes" name="minutes">
+        <option value="5">5 min</option>
+        <option value="10" selected>10 min</option>
+        <option value="15">15 min</option>
+        <option value="30">30 min</option>
+        <option value="60">1 hour</option>
+      </select>
+    </div>
+    <div class="fixed">
+      <label for="radius_m">Allowed distance</label>
+      <select id="radius_m" name="radius_m">
+        <option value="5" selected>5 m</option>
+        <option value="10">10 m</option>
+        <option value="20">20 m</option>
+        <option value="30">30 m</option>
+        <option value="50">50 m</option>
+      </select>
+    </div>
+  </div>
+  <div class="field" style="margin-top:14px">
+    <label>Classroom location</label>
+    <button type="button" class="btn ghost" id="locBtn">Use my current location</button>
+    <input type="hidden" name="latitude" id="lat"><input type="hidden" name="longitude" id="lng">
+    <p class="hint" id="locStatus">Stand inside the classroom and tap the button. Students must be near this spot to mark attendance.</p>
+  </div>
+  <button class="btn" id="startBtn" disabled>Start lecture &amp; create QR code</button>
+</form>
+<script>
+  const btn = document.getElementById('locBtn'), st = document.getElementById('locStatus'),
+        go = document.getElementById('startBtn');
+  btn.addEventListener('click', () => {
+    if (!navigator.geolocation) { st.textContent = 'This browser cannot give a location.'; return; }
+    st.textContent = 'Getting your location...'; btn.disabled = true;
+    navigator.geolocation.getCurrentPosition(p => {
+      document.getElementById('lat').value = p.coords.latitude.toFixed(7);
+      document.getElementById('lng').value = p.coords.longitude.toFixed(7);
+      st.textContent = 'Location saved (accuracy about ' + Math.round(p.coords.accuracy) + ' m).';
+      go.disabled = false; btn.disabled = false; btn.textContent = 'Update location';
+    }, e => {
+      st.textContent = 'Could not get location: ' + e.message + '. Allow location access (the page must be HTTPS or localhost).';
+      btn.disabled = false;
+    }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 0});
+  });
+</script>
+
+<div class="card">
+  <h2>Previous sessions</h2>
+  <ul class="list">
+  {% for s in sessions %}
+    <li>
+      <div>
+        <a class="t" href="{% url 'session_detail' s.token %}">{{ s.title }}</a>
+        <div class="m">{% if s.room_name %}Room {{ s.room_name }} · {% endif %}{{ s.created_at|date:"d M Y, h:i A" }}</div>
+      </div>
+      {% if s.is_active %}<span class="badge on">Open</span>{% else %}<span class="badge off">Closed</span>{% endif %}
+    </li>
+  {% empty %}
+    <li class="empty" style="display:block">No sessions yet. Create one above to get a QR code.</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Mark attendance · QR Attendance{% endblock %}
+{% block content %}
+<div style="max-width:460px;margin:24px auto 0">
+  <h1>{{ session.title }}</h1>
+  <p class="sub">{% if session.room_name %}Room {{ session.room_name }}. {% endif %}You must be inside the classroom (within {{ session.radius_m }} m) to mark attendance.</p>
+  <form method="post" class="card" id="markForm">
+    {% csrf_token %}
+    <input type="hidden" name="latitude" id="lat"><input type="hidden" name="longitude" id="lng">
+    <p id="status" style="margin-top:0;font-weight:700">Checking your location...</p>
+    <button class="btn full" id="submitBtn" disabled>Mark my attendance</button>
+    <button type="button" class="btn ghost full" id="retry" style="display:none;margin-top:10px">Try again</button>
+  </form>
+</div>
+<script>
+  const st = document.getElementById('status'), sub = document.getElementById('submitBtn'),
+        retry = document.getElementById('retry'), form = document.getElementById('markForm');
+  function locate(){
+    retry.style.display = 'none'; sub.disabled = true; st.textContent = 'Checking your location...';
+    if (!navigator.geolocation) { st.textContent = 'This browser cannot give a location.'; retry.style.display = 'block'; return; }
+    navigator.geolocation.getCurrentPosition(p => {
+      document.getElementById('lat').value = p.coords.latitude;
+      document.getElementById('lng').value = p.coords.longitude;
+      st.textContent = 'Location found (accuracy about ' + Math.round(p.coords.accuracy) + ' m). Tap the button to mark attendance.';
+      sub.disabled = false;
+    }, e => {
+      st.textContent = e.code === 1
+        ? 'Location is blocked. Allow location access for this site in your browser settings, then try again.'
+        : 'Could not get your location: ' + e.message;
+      retry.style.display = 'block';
+    }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 0});
+  }
+  retry.addEventListener('click', locate);
+  form.addEventListener('submit', () => { sub.disabled = true; });
+  locate();
+</script>
+{% endblock %}

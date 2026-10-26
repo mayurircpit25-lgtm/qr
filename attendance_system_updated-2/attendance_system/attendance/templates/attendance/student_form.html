@@ -1,0 +1,20 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Add student · QR Attendance{% endblock %}
+{% block content %}
+<div style="max-width:520px">
+  <h1>Add student</h1>
+  <p class="sub">The student logs in with this username and password.</p>
+  <form method="post" class="card">
+    {% csrf_token %}
+    <div class="field"><label>Roll number</label><input name="roll_no" value="{{ data.roll_no|default:'' }}" required></div>
+    <div class="grid2">
+      <div class="field"><label>First name</label><input name="first_name" value="{{ data.first_name|default:'' }}"></div>
+      <div class="field"><label>Last name</label><input name="last_name" value="{{ data.last_name|default:'' }}"></div>
+    </div>
+    <div class="field"><label>Username</label><input name="username" value="{{ data.username|default:'' }}" required></div>
+    <div class="field"><label>Password</label><input type="password" name="password" autocomplete="new-password" required>
+      <p class="hint">At least 6 characters.</p></div>
+    <div class="actions"><button class="btn">Add</button><a class="btn ghost" href="{% url 'student_list' %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

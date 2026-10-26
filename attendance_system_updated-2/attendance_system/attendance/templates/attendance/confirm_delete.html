@@ -1,0 +1,13 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Confirm delete · QR Attendance{% endblock %}
+{% block content %}
+<div style="max-width:480px">
+  <h1>Delete {{ what }}?</h1>
+  <form method="post" class="card">
+    {% csrf_token %}
+    <p style="margin-top:0"><b>{{ name }}</b></p>
+    <p class="hint" style="margin-bottom:16px">{{ note }} This cannot be undone.</p>
+    <div class="actions"><button class="btn danger">Yes, delete</button><a class="btn ghost" href="{% url back %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

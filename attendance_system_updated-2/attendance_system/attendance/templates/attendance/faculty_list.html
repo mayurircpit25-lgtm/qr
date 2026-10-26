@@ -1,0 +1,24 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Faculty · QR Attendance{% endblock %}
+{% block content %}
+<div class="head">
+  <div><h1>Faculty</h1><p class="sub" style="margin:0">{{ faculty|length }} member{{ faculty|length|pluralize }}</p></div>
+  <a class="btn" href="{% url 'faculty_add' %}">Add faculty</a>
+</div>
+<form method="get" class="card row">
+  <div class="grow"><input name="q" value="{{ q }}" placeholder="Search by name, username or email"></div>
+  <button class="btn">Search</button>
+</form>
+<div class="card scroll"><table>
+  <tr><th>Name</th><th>Username</th><th>Email</th><th>Actions</th></tr>
+  {% for f in faculty %}
+  <tr>
+    <td>{{ f.get_full_name|default:"-" }}</td><td>{{ f.username }}</td><td>{{ f.email|default:"-" }}</td>
+    <td><div class="actions">
+      <a class="btn ghost sm" href="{% url 'faculty_edit' f.pk %}">Edit</a>
+      <a class="btn danger sm" href="{% url 'faculty_delete' f.pk %}">Delete</a>
+    </div></td>
+  </tr>
+  {% empty %}<tr><td colspan="4" class="empty">No faculty found.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

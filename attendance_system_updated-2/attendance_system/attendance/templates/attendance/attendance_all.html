@@ -1,0 +1,30 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Attendance · QR Attendance{% endblock %}
+{% block content %}
+<h1>Attendance records</h1>
+<p class="sub">{{ records|length }} record{{ records|length|pluralize }}.</p>
+<form method="get" class="card row">
+  <div class="grow">
+    <label for="session">Lecture</label>
+    <select id="session" name="session">
+      <option value="">All lectures</option>
+      {% for s in sessions %}<option value="{{ s.pk }}" {% if selected == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.title }} · {{ s.created_at|date:"d M, h:i A" }} ({{ s.n }})</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn">Filter</button>
+</form>
+<div class="card scroll"><table>
+  <tr><th>Roll no</th><th>Student</th><th>Lecture</th><th>Room</th><th>Distance</th><th>Time</th><th>Status</th></tr>
+  {% for r in records %}
+  <tr>
+    <td>{{ r.student.roll_no }}</td>
+    <td>{{ r.student.user.get_full_name|default:r.student.user.username }}</td>
+    <td>{{ r.session.title }}</td>
+    <td>{{ r.session.room_name|default:"-" }}</td>
+    <td>{% if r.distance_m is not None %}{{ r.distance_m|floatformat:1 }} m{% else %}-{% endif %}</td>
+    <td>{{ r.marked_at|date:"d M Y, h:i A" }}</td>
+    <td><span class="badge on">Present</span></td>
+  </tr>
+  {% empty %}<tr><td colspan="7" class="empty">No attendance recorded.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

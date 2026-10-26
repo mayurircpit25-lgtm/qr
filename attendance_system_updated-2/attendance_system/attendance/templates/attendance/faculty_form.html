@@ -1,0 +1,23 @@
+{% extends 'attendance/base.html' %}
+{% block title %}{% if editing %}Edit{% else %}Add{% endif %} faculty · QR Attendance{% endblock %}
+{% block content %}
+<div style="max-width:520px">
+  <h1>{% if editing %}Edit faculty{% else %}Add faculty{% endif %}</h1>
+  <p class="sub">Faculty can create lectures and QR codes.</p>
+  <form method="post" class="card">
+    {% csrf_token %}
+    <div class="grid2">
+      <div class="field"><label>First name</label><input name="first_name" value="{{ data.first_name|default:'' }}"></div>
+      <div class="field"><label>Last name</label><input name="last_name" value="{{ data.last_name|default:'' }}"></div>
+    </div>
+    <div class="field"><label>Username</label>
+      <input name="username" value="{{ data.username|default:'' }}" {% if editing %}readonly{% else %}required{% endif %}></div>
+    <div class="field"><label>Email</label><input type="email" name="email" value="{{ data.email|default:'' }}"></div>
+    <div class="field"><label>{% if editing %}New password (leave blank to keep){% else %}Password{% endif %}</label>
+      <input type="password" name="password" autocomplete="new-password" {% if not editing %}required{% endif %}>
+      <p class="hint">At least 6 characters.</p></div>
+    <div class="actions"><button class="btn">{% if editing %}Save changes{% else %}Add{% endif %}</button>
+      <a class="btn ghost" href="{% url 'faculty_list' %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

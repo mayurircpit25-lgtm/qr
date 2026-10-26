@@ -1,0 +1,40 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Admin · QR Attendance{% endblock %}
+{% block content %}
+<h1>Admin dashboard</h1>
+<p class="sub">Manage faculty and students, and view attendance.</p>
+
+<div class="stats">
+  <div class="card"><small>Faculty</small><b>{{ faculty_count }}</b></div>
+  <div class="card"><small>Students</small><b>{{ student_count }}</b></div>
+  <div class="card"><small>Lectures</small><b>{{ session_count }}</b></div>
+  <div class="card"><small>Attendance marked</small><b>{{ attendance_count }}</b></div>
+</div>
+
+<div class="card">
+  <h2>Quick actions</h2>
+  <div class="actions">
+    <a class="btn" href="{% url 'faculty_add' %}">Add faculty</a>
+    <a class="btn ghost" href="{% url 'faculty_list' %}">View faculty</a>
+    <a class="btn ghost" href="{% url 'student_add' %}">Add student</a>
+    <a class="btn ghost" href="{% url 'student_list' %}">View students</a>
+    <a class="btn ghost" href="{% url 'attendance_all' %}">View attendance</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Latest attendance</h2>
+  <div class="scroll"><table>
+    <tr><th>Student</th><th>Lecture</th><th>Distance</th><th>Time</th><th>Status</th></tr>
+    {% for r in recent %}
+    <tr>
+      <td>{{ r.student.user.get_full_name|default:r.student.user.username }} <span class="m">({{ r.student.roll_no }})</span></td>
+      <td>{{ r.session.title }}</td>
+      <td>{% if r.distance_m is not None %}{{ r.distance_m|floatformat:1 }} m{% else %}-{% endif %}</td>
+      <td>{{ r.marked_at|date:"d M, h:i A" }}</td>
+      <td><span class="badge on">Present</span></td>
+    </tr>
+    {% empty %}<tr><td colspan="5" class="empty">No attendance recorded yet.</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endblock %}

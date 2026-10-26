@@ -1,0 +1,21 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Students · QR Attendance{% endblock %}
+{% block content %}
+<div class="head">
+  <div><h1>Students</h1><p class="sub" style="margin:0">{{ students|length }} student{{ students|length|pluralize }}</p></div>
+  <a class="btn" href="{% url 'student_add' %}">Add student</a>
+</div>
+<form method="get" class="card row">
+  <div class="grow"><input name="q" value="{{ q }}" placeholder="Search by roll no, name or username"></div>
+  <button class="btn">Search</button>
+</form>
+<div class="card scroll"><table>
+  <tr><th>Roll no</th><th>Name</th><th>Username</th><th>Actions</th></tr>
+  {% for s in students %}
+  <tr>
+    <td>{{ s.roll_no }}</td><td>{{ s.user.get_full_name|default:"-" }}</td><td>{{ s.user.username }}</td>
+    <td><a class="btn danger sm" href="{% url 'student_delete' s.pk %}">Delete</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="4" class="empty">No students found.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

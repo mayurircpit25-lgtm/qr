@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}QR Attendance{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#edf1f7; --card:#fff; --ink:#162033; --muted:#5d6b82; --line:#d9e0ec;
+      --brand:#2347d9; --brand-dark:#1a37b0; --ok:#11795a; --ok-bg:#dff5ec;
+      --bad:#b3261e; --bad-bg:#fde8e6; --info-bg:#e4eafc;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.5}
+    a{color:var(--brand)}
+    .nav{background:var(--card);border-bottom:1px solid var(--line)}
+    .nav-in{max-width:980px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--ink);text-decoration:none;margin-right:auto}
+    .brand svg{width:28px;height:28px}
+    .nav a.link{color:var(--muted);text-decoration:none;font-weight:700;font-size:14px}
+    .nav a.link:hover{color:var(--ink)}
+    .nav form{margin:0}
+    main{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+    h1{font-size:28px;line-height:1.2;margin:0 0 4px;font-weight:800}
+    h2{font-size:18px;margin:0 0 12px;font-weight:800}
+    .sub{color:var(--muted);margin:0 0 24px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+    label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+    input,select{width:100%;padding:11px 12px;font:inherit;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+    input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid #9db1f5;outline-offset:1px}
+    .field{margin-bottom:14px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+    .row .grow{flex:1 1 200px}.row .fixed{flex:0 0 140px}
+    .btn{display:inline-block;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+    .btn:hover{background:var(--brand-dark)}
+    .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);padding:7px 14px;font-size:14px}
+    .btn.ghost:hover{background:var(--bg)}
+    .btn.full{width:100%}
+    .msg{padding:12px 14px;border-radius:10px;margin-bottom:16px;font-weight:700;font-size:14px}
+    .msg.success{background:var(--ok-bg);color:var(--ok)}
+    .msg.error{background:var(--bad-bg);color:var(--bad)}
+    .msg.info,.msg.warning,.msg.debug{background:var(--info-bg);color:var(--brand-dark)}
+    .badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700}
+    .badge.on{background:var(--ok-bg);color:var(--ok)}
+    .badge.off{background:#e9edf3;color:var(--muted)}
+    .list{list-style:none;margin:0;padding:0}
+    .list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+    .list li:first-child{border-top:0}
+    .list .t{font-weight:700}
+    .list .m{color:var(--muted);font-size:13px}
+    .empty{color:var(--muted);text-align:center;padding:20px 0}
+    .errorlist{list-style:none;padding:0;margin:0 0 12px;color:var(--bad);font-size:14px;font-weight:700}
+    .btn.danger{background:var(--bad)}.btn.danger:hover{background:#8f1d17}
+    .btn.sm{padding:6px 12px;font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+    .stats .card{margin:0}.stats small{color:var(--muted);font-weight:700}.stats b{display:block;font-size:34px;line-height:1.1}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{text-align:left;padding:10px 8px;border-top:1px solid var(--line);vertical-align:middle}
+    th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;border-top:0}
+    .scroll{overflow-x:auto}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .head h1{margin:0}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+    .hint{color:var(--muted);font-size:13px;margin:6px 0 0}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-in">
+      <a class="brand" href="{% url 'home' %}">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2347d9"/><path fill="#fff" d="M6 6h8v8H6zM18 6h8v8h-8zM6 18h8v8H6zM18 18h3v3h-3zM23 18h3v3h-3zM18 23h3v3h-3zM23 23h3v3h-3z"/></svg>
+        QR Attendance
+      </a>
+      {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+          <a class="link" href="{% url 'admin_home' %}">Dashboard</a>
+          <a class="link" href="{% url 'faculty_list' %}">Faculty</a>
+          <a class="link" href="{% url 'student_list' %}">Students</a>
+          <a class="link" href="{% url 'attendance_all' %}">Attendance</a>
+        {% elif user.is_staff %}
+          <a class="link" href="{% url 'session_list' %}">Sessions</a>
+          <a class="link" href="{% url 'faculty_students' %}">Students</a>
+        {% else %}
+          <a class="link" href="{% url 'my_attendance' %}">My attendance</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="btn ghost">Log out ({{ user.username }})</button>
+        </form>
+      {% endif %}
+    </div>
+  </header>
+  <main>
+    {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

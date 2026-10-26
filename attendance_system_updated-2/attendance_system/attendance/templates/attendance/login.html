@@ -1,0 +1,22 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Log in · QR Attendance{% endblock %}
+{% block content %}
+<div style="max-width:420px;margin:24px auto 0">
+  <h1>{% if request.GET.role == 'student' %}Student login{% elif request.GET.role == 'teacher' %}Teacher login{% else %}Log in{% endif %}</h1>
+  <p class="sub">Teachers create QR codes. Students scan them to mark attendance.</p>
+  <form method="post" class="card">
+    {% csrf_token %}
+    {% if form.errors %}<ul class="errorlist"><li>Username or password is wrong. Check both and try again.</li></ul>{% endif %}
+    <div class="field">
+      <label for="id_username">Username</label>
+      <input type="text" name="username" id="id_username" autofocus required autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="id_password">Password</label>
+      <input type="password" name="password" id="id_password" required autocomplete="current-password">
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn full">Log in</button>
+  </form>
+</div>
+{% endblock %}
